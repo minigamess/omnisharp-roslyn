@@ -8,6 +8,7 @@ on:
       - master
     paths:
       - 'src/OmniSharp.Stdio.Driver/**'
+      - '.github/workflows/**'
 
 jobs:
   publish:
