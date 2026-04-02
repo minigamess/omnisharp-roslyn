@@ -3,7 +3,7 @@
     <PropertyGroup>
         <TargetFrameworks>net6.0;net472</TargetFrameworks>
         <PlatformTarget>AnyCPU</PlatformTarget>
-        <AssemblyName>OmniSharp</AssemblyName>
+        <AssemblyName>omnisharp</AssemblyName>
         <OutputType>Exe</OutputType>
         <PreserveCompilationContext>true</PreserveCompilationContext>
         <RuntimeIdentifiers>win7-x64;win7-x86;win10-arm64</RuntimeIdentifiers>
@@ -15,16 +15,16 @@
 
         <!-- NuGet Global Tool packaging -->
         <PackAsTool>true</PackAsTool>
-        <ToolCommandName>OmniSharp</ToolCommandName>
-        <PackageId>OmniSharp</PackageId>
-        <Version>1.39.0</Version>
-        <Description>OmniSharp based on Roslyn for C# language features</Description>
-        <Authors>OmniSharp Team</Authors>
+        <ToolCommandName>omnisharp</ToolCommandName>
+        <PackageId>minigamess.omnisharp</PackageId>
+        <Version>1.0.0</Version>
+        <Description>OmniSharp based on Roslyn with diagnostic export command</Description>
+        <Authors>minigamess</Authors>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
-        <PackageProjectUrl>https://github.com/omnisharp/omnisharp-roslyn</PackageProjectUrl>
-        <RepositoryUrl>https://github.com/omnisharp/omnisharp-roslyn</RepositoryUrl>
-        <Copyright>Copyright 2024 OmniSharp</Copyright>
-        <PackageTags>omnisharp;roslyn;csharp;language-server</PackageTags>
+        <PackageProjectUrl>https://github.com/minigamess/omnisharp-roslyn</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/minigamess/omnisharp-roslyn</RepositoryUrl>
+        <Copyright>Copyright 2024 minigamess</Copyright>
+        <PackageTags>omnisharp;roslyn;csharp;language-server;diagnostic</PackageTags>
     </PropertyGroup>
 
     <ItemGroup>
