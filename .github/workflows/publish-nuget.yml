@@ -21,14 +21,10 @@ jobs:
         with:
           dotnet-version: '6.0.x'
 
-      - name: Restore and Build
-        run: dotnet restore src/OmniSharp.Stdio.Driver/OmniSharp.Stdio.Driver.csproj && dotnet build src/OmniSharp.Stdio.Driver/OmniSharp.Stdio.Driver.csproj -c Release
-
       - name: Pack
-        run: dotnet pack src/OmniSharp.Stdio.Driver/OmniSharp.Stdio.Driver.csproj -c Release --no-build -o ./nupkg
-
-      - name: List nupkg
-        run: ls -la ./nupkg/
+        run: |
+          dotnet pack src/OmniSharp.Stdio.Driver/OmniSharp.Stdio.Driver.csproj -c Release -f net6.0 -o ./nupkg
+          ls -la ./nupkg/
 
       - name: Publish to NuGet
         if: github.event_name == 'release'
