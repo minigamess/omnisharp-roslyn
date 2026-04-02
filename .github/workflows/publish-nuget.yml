@@ -23,9 +23,9 @@ jobs:
 
       - name: Build and Pack
         run: |
-          dotnet build src/OmniSharp.Stdio.Driver/OmniSharp.Stdio.Driver.csproj -c Release -p:TargetFramework=net6.0
-          dotnet pack src/OmniSharp.Stdio.Driver/OmniSharp.Stdio.Driver.csproj -c Release -p:TargetFramework=net6.0 -o ./nupkg
-          ls -la ./nupkg/
+          dotnet build src/OmniSharp.Stdio.Driver/OmniSharp.Stdio.Driver.csproj -c Release -p:TargetFramework=net6.0 -v:n
+          dotnet pack src/OmniSharp.Stdio.Driver/OmniSharp.Stdio.Driver.csproj -c Release -p:TargetFramework=net6.0 -o ./nupkg -v:n
+          ls -la ./nupkg/ || echo "No nupkg directory"
 
       - name: Publish to NuGet
         if: github.event_name == 'release'
