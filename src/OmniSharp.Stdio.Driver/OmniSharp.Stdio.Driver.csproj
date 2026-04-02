@@ -6,7 +6,6 @@
         <AssemblyName>omnisharp</AssemblyName>
         <OutputType>Exe</OutputType>
         <PreserveCompilationContext>true</PreserveCompilationContext>
-        <RuntimeIdentifiers>win7-x64;win7-x86;win10-arm64</RuntimeIdentifiers>
 
         <!-- Always run on the latest runtime installed. -->
         <RuntimeFrameworkVersion>6.0.0-preview.7.21317.1</RuntimeFrameworkVersion>
@@ -14,6 +13,7 @@
         <SkipHostDlls Condition="'$(TargetFramework)' != 'net472'">true</SkipHostDlls>
 
         <!-- NuGet Global Tool packaging -->
+        <IsPackable>true</IsPackable>
         <PackAsTool>true</PackAsTool>
         <ToolCommandName>omnisharp</ToolCommandName>
         <PackageId>minigamess.omnisharp</PackageId>
