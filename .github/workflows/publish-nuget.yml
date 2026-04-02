@@ -23,7 +23,7 @@ jobs:
 
       - name: Pack
         run: |
-          dotnet pack src/OmniSharp.Stdio.Driver/OmniSharp.Stdio.Driver.csproj -c Release -f net6.0 -o ./nupkg
+          dotnet pack src/OmniSharp.Stdio.Driver/OmniSharp.Stdio.Driver.csproj -c Release -o ./nupkg
           ls -la ./nupkg/
 
       - name: Publish to NuGet
