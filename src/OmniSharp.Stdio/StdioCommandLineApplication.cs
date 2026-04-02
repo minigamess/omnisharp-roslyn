@@ -1,3 +1,4 @@
+using System;
 using McMaster.Extensions.CommandLineUtils;
 using OmniSharp.Internal;
 
@@ -17,5 +18,10 @@ namespace OmniSharp.Stdio
         public bool Lsp => _lsp.HasValue();
 
         public string Encoding => _encoding.GetValueOrDefault<string>(null);
+
+        public McMaster.Extensions.CommandLineUtils.CommandLineApplication AddCommand(string name, Action<McMaster.Extensions.CommandLineUtils.CommandLineApplication> configuration)
+        {
+            return Application.Command(name, configuration);
+        }
     }
 }

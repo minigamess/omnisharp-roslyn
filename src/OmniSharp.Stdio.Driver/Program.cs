@@ -18,6 +18,18 @@ namespace OmniSharp.Stdio.Driver
         static int Main(string[] args) => HostHelpers.Start(() =>
         {
             var application = new StdioCommandLineApplication();
+
+            application.AddCommand("diagnostic", cmd =>
+            {
+                cmd.Description = "Diagnostic commands for OmniSharp.";
+                DiagnosticExportCommand.Register(cmd, application);
+                cmd.OnExecute(() =>
+                {
+                    cmd.ShowHelp();
+                    return 0;
+                });
+            });
+
             application.OnExecute(() =>
             {
                 // If an encoding was specified, be sure to set the Console with it before we access the input/output streams.
