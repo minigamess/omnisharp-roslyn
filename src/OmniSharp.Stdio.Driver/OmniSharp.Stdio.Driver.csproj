@@ -12,6 +12,19 @@
         <RuntimeFrameworkVersion>6.0.0-preview.7.21317.1</RuntimeFrameworkVersion>
         <RollForward>LatestMajor</RollForward>
         <SkipHostDlls Condition="'$(TargetFramework)' != 'net472'">true</SkipHostDlls>
+
+        <!-- NuGet Global Tool packaging -->
+        <PackAsTool>true</PackAsTool>
+        <ToolCommandName>OmniSharp</ToolCommandName>
+        <PackageId>OmniSharp</PackageId>
+        <Version>1.39.0</Version>
+        <Description>OmniSharp based on Roslyn for C# language features</Description>
+        <Authors>OmniSharp Team</Authors>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <PackageProjectUrl>https://github.com/omnisharp/omnisharp-roslyn</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/omnisharp/omnisharp-roslyn</RepositoryUrl>
+        <Copyright>Copyright 2024 OmniSharp</Copyright>
+        <PackageTags>omnisharp;roslyn;csharp;language-server</PackageTags>
     </PropertyGroup>
 
     <ItemGroup>
