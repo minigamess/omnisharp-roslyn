@@ -23,8 +23,8 @@ jobs:
 
       - name: Build and Pack
         run: |
-          dotnet build src/OmniSharp.Stdio.Driver/OmniSharp.Stdio.Driver.csproj -c Release
-          dotnet pack src/OmniSharp.Stdio.Driver/OmniSharp.Stdio.Driver.csproj -c Release -o ./nupkg
+          dotnet build src/OmniSharp.Stdio.Driver/OmniSharp.Stdio.Driver.csproj -c Release -p:TargetFramework=net6.0
+          dotnet pack src/OmniSharp.Stdio.Driver/OmniSharp.Stdio.Driver.csproj -c Release -p:TargetFramework=net6.0 -o ./nupkg
           ls -la ./nupkg/
 
       - name: Publish to NuGet
