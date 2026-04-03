@@ -28,6 +28,7 @@ namespace OmniSharp.Stdio.Driver
             parent.Command("export", cmd =>
             {
                 cmd.Description = "Export compilation diagnostics to JSON or JSONL.";
+                cmd.HelpOption("-? | -h | --help");
                 var outputOpt = cmd.Option("-o|--output <path>", "Output file path (default: stdout)", CommandOptionType.SingleValue);
                 var formatOpt = cmd.Option("-f|--format <format>", "Output format: json or jsonl (default: json)", CommandOptionType.SingleValue);
                 var levelOpt = cmd.Option("-l|--level <level>", "Minimum severity: Hidden, Info, Warning, Error (default: Warning)", CommandOptionType.SingleValue);
