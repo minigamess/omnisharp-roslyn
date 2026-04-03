@@ -20,6 +20,7 @@ namespace OmniSharp.Http
         private readonly PluginAssemblies _commandLinePlugins;
         private readonly int _serverPort;
         private readonly string _serverInterface;
+        private Process _hostProcess;
 
         public Host(
             IOmniSharpEnvironment environment,
@@ -81,14 +82,12 @@ namespace OmniSharp.Http
                 {
                     try
                     {
-                        var hostProcess = Process.GetProcessById(_environment.HostProcessId);
-                        hostProcess.EnableRaisingEvents = true;
-                        hostProcess.OnExit(() => appLifeTime.StopApplication());
+                        _hostProcess = Process.GetProcessById(_environment.HostProcessId);
+                        _hostProcess.EnableRaisingEvents = true;
+                        _hostProcess.OnExit(() => appLifeTime.StopApplication());
                     }
                     catch
                     {
-                        // If the process dies before we get here then request shutdown
-                        // immediately
                         appLifeTime.StopApplication();
                     }
                 }

@@ -31,6 +31,7 @@ namespace OmniSharp.Stdio
         private readonly IOmniSharpEnvironment _environment;
         private readonly CancellationTokenSource _cancellationTokenSource;
         private readonly CachedStringBuilder _cachedStringBuilder;
+        private Process _hostProcess;
         private static readonly double TimestampToTicks = TimeSpan.TicksPerSecond / (double)Stopwatch.Frequency;
 
         public Host(
@@ -182,14 +183,12 @@ namespace OmniSharp.Stdio
             {
                 try
                 {
-                    var hostProcess = Process.GetProcessById(_environment.HostProcessId);
-                    hostProcess.EnableRaisingEvents = true;
-                    hostProcess.OnExit(() => _cancellationTokenSource.Cancel());
+                    _hostProcess = Process.GetProcessById(_environment.HostProcessId);
+                    _hostProcess.EnableRaisingEvents = true;
+                    _hostProcess.OnExit(() => _cancellationTokenSource.Cancel());
                 }
                 catch
                 {
-                    // If the process dies before we get here then request shutdown
-                    // immediately
                     _cancellationTokenSource.Cancel();
                 }
             }

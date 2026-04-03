@@ -50,6 +50,7 @@ namespace OmniSharp.LanguageServerProtocol
         private CompositionHost _compositionHost;
         private IServiceProvider _serviceProvider;
         private readonly Action<ILoggingBuilder> _configureLogging;
+        private Process _hostProcess;
 
         public LanguageServerHost(
             Stream input,
@@ -147,14 +148,12 @@ namespace OmniSharp.LanguageServerProtocol
             {
                 try
                 {
-                    var hostProcess = Process.GetProcessById(environment.HostProcessId);
-                    hostProcess.EnableRaisingEvents = true;
-                    hostProcess.OnExit(Cancel);
+                    _hostProcess = Process.GetProcessById(environment.HostProcessId);
+                    _hostProcess.EnableRaisingEvents = true;
+                    _hostProcess.OnExit(Cancel);
                 }
                 catch
                 {
-                    // If the process dies before we get here then request shutdown
-                    // immediately
                     Cancel();
                 }
             }
