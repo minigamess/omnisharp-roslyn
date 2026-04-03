@@ -17,7 +17,6 @@
         <PackAsTool>true</PackAsTool>
         <ToolCommandName>omnisharp</ToolCommandName>
         <PackageId>minigamess.omnisharp</PackageId>
-        <Version>1.0.5</Version>
         <Description>OmniSharp based on Roslyn with diagnostic export command</Description>
         <Authors>minigamess</Authors>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>

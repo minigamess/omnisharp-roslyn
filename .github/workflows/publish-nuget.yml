@@ -2,11 +2,12 @@ name: Publish NuGet Global Tool
 
 on:
   release:
-    types: [created]
+    types: [published]
   push:
     branches:
       - master
     paths:
+      - 'build/Settings.props'
       - 'src/OmniSharp.Stdio.Driver/**'
       - '.github/workflows/**'
 

@@ -11,6 +11,7 @@
     <CheckEolTargetFramework>false</CheckEolTargetFramework>
     <NoWarn>NU1701;NU5104;NU1901;NU1903</NoWarn>
     <IsPackable>false</IsPackable>
+    <Version>1.0.5</Version>
     <Authors>OmniSharp Contributors</Authors>
     <PackageTags>omnisharp;lsp;csharp;roslyn;language</PackageTags>
     <PackageIcon>images/omnisharp.png</PackageIcon>
