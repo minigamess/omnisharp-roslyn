@@ -23,6 +23,7 @@ namespace OmniSharp.Stdio.Driver
             {
                 cmd.Description = "Diagnostic commands for OmniSharp.";
                 DiagnosticExportCommand.Register(cmd, application);
+                DiagnosticEnumCastCommand.Register(cmd, application);
                 cmd.OnExecute(() =>
                 {
                     cmd.ShowHelp();
