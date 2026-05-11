@@ -87,7 +87,13 @@ namespace OmniSharp.Stdio.Driver
 
                 foreach (var result in results)
                 {
-                    Console.WriteLine($"{result.Path}:{result.Line}");
+                    if (string.IsNullOrEmpty(result.Token))
+                    {
+                        Console.WriteLine($"{result.Path}:{result.Line}");
+                        continue;
+                    }
+
+                    Console.WriteLine($"{result.Path}:{result.Line} token={result.Token}");
                 }
 
                 return 0;
@@ -143,9 +149,63 @@ namespace OmniSharp.Stdio.Driver
                     }
 
                     var line = cast.GetLocation().GetLineSpan().StartLinePosition.Line + 1;
-                    yield return new ResultItem(relativePath, line);
+                    var method = cast.AncestorsAndSelf().OfType<MethodDeclarationSyntax>().FirstOrDefault();
+                    var token = method == null ? null : GetCpp2IlToken(method, semanticModel);
+                    yield return new ResultItem(relativePath, line, token);
                 }
             }
+        }
+
+        private static string GetCpp2IlToken(MethodDeclarationSyntax method, SemanticModel semanticModel)
+        {
+            foreach (var attributeList in method.AttributeLists)
+            {
+                foreach (var attribute in attributeList.Attributes)
+                {
+                    if (!IsCpp2IlTokenAttribute(attribute, semanticModel))
+                    {
+                        continue;
+                    }
+
+                    if (attribute.ArgumentList == null)
+                    {
+                        return null;
+                    }
+
+                    foreach (var argument in attribute.ArgumentList.Arguments)
+                    {
+                        if (argument.NameEquals?.Name.Identifier.Text != "Token")
+                        {
+                            continue;
+                        }
+
+                        var tokenValue = semanticModel.GetConstantValue(argument.Expression);
+                        if (!tokenValue.HasValue || tokenValue.Value == null)
+                        {
+                            return argument.Expression.ToString();
+                        }
+
+                        return tokenValue.Value.ToString();
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        private static bool IsCpp2IlTokenAttribute(AttributeSyntax attribute, SemanticModel semanticModel)
+        {
+            var symbol = semanticModel.GetSymbolInfo(attribute).Symbol as IMethodSymbol;
+            if (symbol?.ContainingType?.Name == "Cpp2IlTokenAttribute")
+            {
+                return true;
+            }
+
+            var name = attribute.Name.ToString();
+            return string.Equals(name, "Cpp2IlToken", StringComparison.Ordinal) ||
+                   string.Equals(name, "Cpp2IlTokenAttribute", StringComparison.Ordinal) ||
+                   name.EndsWith(".Cpp2IlToken", StringComparison.Ordinal) ||
+                   name.EndsWith(".Cpp2IlTokenAttribute", StringComparison.Ordinal);
         }
 
         private static bool IsEnumType(ITypeSymbol type)
@@ -185,15 +245,18 @@ namespace OmniSharp.Stdio.Driver
 
         private readonly struct ResultItem
         {
-            public ResultItem(string path, int line)
+            public ResultItem(string path, int line, string token)
             {
                 Path = path;
                 Line = line;
+                Token = token;
             }
 
             public string Path { get; }
 
             public int Line { get; }
+
+            public string Token { get; }
         }
 
         private class NullSharedTextWriter : ISharedTextWriter
