@@ -63,7 +63,7 @@ echo "[3/3] Verifying install..."
 TOOL_PATH="$HOME/.dotnet/tools/omnisharp"
 if [[ -x "$TOOL_PATH" ]]; then
   echo "Installed: $TOOL_PATH"
-  "$TOOL_PATH" --version || true
+  "$TOOL_PATH" -h || true
 else
   echo "Tool installed, but executable not found at $TOOL_PATH" >&2
   echo "Please ensure ~/.dotnet/tools is in PATH." >&2
