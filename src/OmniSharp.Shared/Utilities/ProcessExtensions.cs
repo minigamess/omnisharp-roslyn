@@ -54,7 +54,11 @@ namespace OmniSharp.Utilities
                 }
             }
 
-            TryAttachExitEvent(watchedProcess);
+            if (!PlatformHelper.IsMono)
+            {
+                TryAttachExitEvent(watchedProcess);
+            }
+
             if (HasProcessExited(process))
             {
                 Trigger(watchedProcess);
@@ -103,7 +107,7 @@ namespace OmniSharp.Utilities
             }
             catch
             {
-                Trigger(watchedProcess);
+                // Fall back to background polling in Watcher/CleanUpProcesses.
             }
         }
 
