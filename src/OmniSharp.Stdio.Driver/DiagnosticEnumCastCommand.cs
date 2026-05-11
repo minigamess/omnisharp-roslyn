@@ -80,7 +80,7 @@ namespace OmniSharp.Stdio.Driver
                     matcher.AddInclude(pattern);
                 }
 
-                var results = FindEnumCastMethods(workspace, matcher, environment.TargetDirectory)
+                var results = FindEnumCastLocations(workspace, matcher, environment.TargetDirectory)
                     .OrderBy(r => r.Path, StringComparer.OrdinalIgnoreCase)
                     .ThenBy(r => r.Line)
                     .ToList();
@@ -99,7 +99,7 @@ namespace OmniSharp.Stdio.Driver
             }
         }
 
-        private static IEnumerable<ResultItem> FindEnumCastMethods(OmniSharpWorkspace workspace, Matcher matcher, string targetDirectory)
+        private static IEnumerable<ResultItem> FindEnumCastLocations(OmniSharpWorkspace workspace, Matcher matcher, string targetDirectory)
         {
             var allDocuments = workspace.CurrentSolution.Projects.SelectMany(x => x.Documents);
 
@@ -133,32 +133,19 @@ namespace OmniSharp.Stdio.Driver
                     continue;
                 }
 
-                var methods = syntaxRoot.DescendantNodes().OfType<MethodDeclarationSyntax>();
-                foreach (var method in methods)
+                var casts = syntaxRoot.DescendantNodes().OfType<CastExpressionSyntax>();
+                foreach (var cast in casts)
                 {
-                    if (!ContainsEnumCast(method, semanticModel))
+                    var castType = semanticModel.GetTypeInfo(cast.Type).Type;
+                    if (!IsEnumType(castType))
                     {
                         continue;
                     }
 
-                    var line = method.GetLocation().GetLineSpan().StartLinePosition.Line + 1;
+                    var line = cast.GetLocation().GetLineSpan().StartLinePosition.Line + 1;
                     yield return new ResultItem(relativePath, line);
                 }
             }
-        }
-
-        private static bool ContainsEnumCast(MethodDeclarationSyntax method, SemanticModel semanticModel)
-        {
-            foreach (var cast in method.DescendantNodes().OfType<CastExpressionSyntax>())
-            {
-                var castType = semanticModel.GetTypeInfo(cast.Type).Type;
-                if (IsEnumType(castType))
-                {
-                    return true;
-                }
-            }
-
-            return false;
         }
 
         private static bool IsEnumType(ITypeSymbol type)
