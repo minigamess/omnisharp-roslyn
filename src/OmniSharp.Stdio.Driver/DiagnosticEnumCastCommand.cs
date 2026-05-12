@@ -142,8 +142,9 @@ namespace OmniSharp.Stdio.Driver
                 var casts = syntaxRoot.DescendantNodes().OfType<CastExpressionSyntax>();
                 foreach (var cast in casts)
                 {
-                    var castType = semanticModel.GetTypeInfo(cast.Type).Type;
-                    if (!IsEnumType(castType))
+                    var targetType = semanticModel.GetTypeInfo(cast.Type).Type;
+                    var sourceType = semanticModel.GetTypeInfo(cast.Expression).Type;
+                    if (!IsEnumType(targetType) && !IsEnumType(sourceType))
                     {
                         continue;
                     }
