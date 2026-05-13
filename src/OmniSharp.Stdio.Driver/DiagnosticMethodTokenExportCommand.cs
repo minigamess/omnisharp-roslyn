@@ -101,11 +101,12 @@ namespace OmniSharp.Stdio.Driver
                 var entries = CollectTokens(workspace, allDiagnostics, minSeverity.Value, rootPath)
                     .OrderBy(x => x.FilePath, StringComparer.Ordinal)
                     .ThenBy(x => x.Token, StringComparer.Ordinal)
+                    .ThenBy(x => x.DiagnosticMessage, StringComparer.Ordinal)
                     .ToList();
 
                 foreach (var entry in entries)
                 {
-                    Console.WriteLine($"{entry.FilePath}\t{entry.Token}");
+                    Console.WriteLine($"{entry.FilePath}\t{entry.Token}\t{entry.DiagnosticMessage}");
                 }
 
                 return 0;
@@ -159,7 +160,7 @@ namespace OmniSharp.Stdio.Driver
                     var node = syntaxRoot.FindNode(diagnostic.Location.SourceSpan, getInnermostNodeForTie: true);
                     foreach (var token in GetTokensForDiagnostic(node, semanticModel))
                     {
-                        entries.Add(new TokenEntry(filePath, token.Trim()));
+                        entries.Add(new TokenEntry(filePath, token.Trim(), diagnostic.GetMessage()));
                     }
                 }
             }
@@ -323,18 +324,20 @@ namespace OmniSharp.Stdio.Driver
         {
             public string FilePath { get; }
             public string Token { get; }
+            public string DiagnosticMessage { get; }
 
-            public TokenEntry(string filePath, string token)
+            public TokenEntry(string filePath, string token, string diagnosticMessage)
             {
                 FilePath = filePath;
                 Token = token;
+                DiagnosticMessage = diagnosticMessage;
             }
 
-            public bool Equals(TokenEntry other) => FilePath == other.FilePath && Token == other.Token;
+            public bool Equals(TokenEntry other) => FilePath == other.FilePath && Token == other.Token && DiagnosticMessage == other.DiagnosticMessage;
 
             public override bool Equals(object obj) => obj is TokenEntry other && Equals(other);
 
-            public override int GetHashCode() => (FilePath, Token).GetHashCode();
+            public override int GetHashCode() => (FilePath, Token, DiagnosticMessage).GetHashCode();
         }
     }
 }
