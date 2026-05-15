@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using McMaster.Extensions.CommandLineUtils;
@@ -29,18 +30,19 @@ namespace OmniSharp.Stdio.Driver
 
                 var levelOpt = cmd.Option("-l|--level <level>", "Minimum severity: Hidden, Info, Warning, Error (default: Error)", CommandOptionType.SingleValue);
                 var timeoutOpt = cmd.Option("-t|--timeout <seconds>", "Timeout waiting for diagnostics (default: 10)", CommandOptionType.SingleValue);
+                var groupByFilepathOpt = cmd.Option("-g|--group-by-filepath", "Output one line per filepath", CommandOptionType.NoValue);
 
                 cmd.OnExecute(() =>
                 {
                     var level = levelOpt.Value() ?? "Error";
                     var timeoutSeconds = int.TryParse(timeoutOpt.Value(), out var t) ? t : 10;
 
-                    return Execute(application, level, timeoutSeconds);
+                    return Execute(application, level, timeoutSeconds, groupByFilepathOpt.HasValue());
                 });
             });
         }
 
-        private static int Execute(StdioCommandLineApplication application, string level, int timeoutSeconds)
+        private static int Execute(StdioCommandLineApplication application, string level, int timeoutSeconds, bool groupByFilepath)
         {
             try
             {
@@ -104,9 +106,47 @@ namespace OmniSharp.Stdio.Driver
                     .ThenBy(x => x.DiagnosticMessage, StringComparer.Ordinal)
                     .ToList();
 
-                foreach (var entry in entries)
+                if (groupByFilepath)
                 {
-                    Console.WriteLine($"{entry.FilePath}\t{entry.Token}\t{entry.DiagnosticMessage}");
+                    foreach (var group in entries.GroupBy(x => x.FilePath, StringComparer.Ordinal))
+                    {
+                        var tokenDiagnostics = group
+                            .GroupBy(x => x.Token, StringComparer.Ordinal)
+                            .OrderBy(x => x.Key, StringComparer.Ordinal)
+                            .Select(tokenGroup =>
+                            {
+                                var normalizedMessages = tokenGroup
+                                    .Select(x => NormalizeSingleLine(x.DiagnosticMessage))
+                                    .Where(x => !string.IsNullOrWhiteSpace(x))
+                                    .Distinct(StringComparer.Ordinal)
+                                    .OrderBy(x => x, StringComparer.Ordinal)
+                                    .ToList();
+
+                                var token = string.IsNullOrWhiteSpace(tokenGroup.Key) ? "<no-token>" : tokenGroup.Key;
+                                return $"{token}:{BuildMessageSummary(normalizedMessages)}";
+                            })
+                            .ToList();
+
+                        Console.WriteLine($"{group.Key}\tdiagnostics={group.Count()}\ttokens={tokenDiagnostics.Count}\t{string.Join(" | ", tokenDiagnostics)}");
+                    }
+                }
+                else
+                {
+                    foreach (var tokenGroup in entries
+                        .GroupBy(x => new { x.FilePath, x.Token })
+                        .OrderBy(x => x.Key.FilePath, StringComparer.Ordinal)
+                        .ThenBy(x => x.Key.Token, StringComparer.Ordinal))
+                    {
+                        var messages = tokenGroup
+                            .Select(x => NormalizeSingleLine(x.DiagnosticMessage))
+                            .Where(x => !string.IsNullOrWhiteSpace(x))
+                            .Distinct(StringComparer.Ordinal)
+                            .OrderBy(x => x, StringComparer.Ordinal)
+                            .ToList();
+
+                        var token = string.IsNullOrWhiteSpace(tokenGroup.Key.Token) ? "<no-token>" : tokenGroup.Key.Token;
+                        Console.WriteLine($"{tokenGroup.Key.FilePath}\tdiagnostics={tokenGroup.Count()}\ttokens=1\t{token}:{BuildMessageSummary(messages)}");
+                    }
                 }
 
                 return 0;
@@ -296,6 +336,38 @@ namespace OmniSharp.Stdio.Driver
         {
             Thread.Sleep(timeoutMs);
             return true;
+        }
+
+        private static string NormalizeSingleLine(string value)
+        {
+            if (string.IsNullOrEmpty(value))
+            {
+                return value;
+            }
+
+            var builder = new StringBuilder(value.Length);
+            foreach (var ch in value)
+            {
+                builder.Append(ch == '\r' || ch == '\n' || ch == '\t' ? ' ' : ch);
+            }
+
+            return builder.ToString().Trim();
+        }
+
+        private static string BuildMessageSummary(IReadOnlyList<string> messages)
+        {
+            if (messages.Count == 0)
+            {
+                return string.Empty;
+            }
+
+            const int previewCount = 3;
+            if (messages.Count <= previewCount)
+            {
+                return string.Join(" ; ", messages);
+            }
+
+            return string.Join(" ; ", messages.Take(previewCount)) + $" ; ...(+{messages.Count - previewCount})";
         }
 
         private static string GetRelativePath(string fullPath, string rootPath)
